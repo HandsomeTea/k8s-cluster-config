@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: configmap-env
+data:
+    # 以key-value的形式配置
+    user_manager_addr: http://user_manager:8080

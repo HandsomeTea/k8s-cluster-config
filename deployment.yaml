@@ -2,10 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
     # deployment名称
-    name: http-deployment
+    name: http-server-deployment
     # deployment标签
     labels:
-        app: http-deployment
+        deployment: http-server
 spec:
     replicas: 3 # pod期望保活的数量
     selector: # pod选择器，即选择哪些pod属于这个deployment，如下，选择的是标签为app=http-server的pod
@@ -16,3 +16,29 @@ spec:
         rollingUpdate: # 滚动更新策略
             maxSurge: 1 # 滚动更新时，先创建新的，再删除旧的，maxSurge表示最多可以比期望的pod数量多几个，即最多可以创建几个新的pod以便删除对应数量的旧的pod
             maxUnavailable: 1 # 滚动更新时，最多可以有几个旧的pod不可用，即最多可以有几个旧的pod正在被删除，但还未删除完成
+    # 定义pod
+    template:
+        metadata:
+            labels:
+                app: http-server # pod标签
+        spec:
+            containers:
+                - name: app # 容器名称，容器可多ge
+                  image: images.my-company.example/app:v4 # 容器对应的镜像地址
+                  ports:
+                      - containerPort: 80 # 容器对外提供服务的端口
+                        name: http-svc-port # 端口名称
+                  # pod资源限制
+                  resources:
+                      requests: # pod创建时的最低资源需求
+                          memory: "64Mi" # 内存 1M = 1000KB, 1Mi = 1024KB(标准的1兆), 后缀区分大小写，不能写为m/mi
+                          cpu: "250m" # cpu单位仅为m，1m表示0.001核，即千分之一个核，如250m表示0.25核
+                      limits: # pod运行时的最大资源限制
+                          memory: "128Mi"
+                          cpu: "500m"
+                  env: # 环境变量
+                      - name: USER_MANAGER_ADDR # 代码中要获取的环境变量名称
+                        valueFrom:
+                            configMapKeyRef:
+                                name: configmap-env # configmap名称
+                                key: user_manager_addr # configmap的data中key名称
