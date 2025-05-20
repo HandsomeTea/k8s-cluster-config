@@ -1,0 +1,17 @@
+# 负载均衡时，ingress的流量先分配到service，再由service分配到pod
+# service就是一个中间层，用于匹配同一类可以处理相同逻辑的pod，并将流量分发到这些pod
+# ingress不方便直接将流量分配到最底层pod，所以需要service作为中间层
+apiVersion: v1
+kind: Service
+metadata:
+    # service的名称
+    name: http-service
+spec:
+    selector:
+        # 匹配app=http-server的pod
+        app: http-server
+    ports:
+        - name: name-of-service-port # 定义一个service对外提供服务的端口组(这么做使service与pod的端口解耦)
+          port: 80 # 当前端口组对外提供服务的端口号
+          protocol: TCP # 当前端口组对外提供服务的端口协议
+          targetPort: http-svc-port # 当前端口组匹配到的流量将转发到这个service匹配的pod的哪个端口，填写的是pod中container对外提供服务的端口名称

@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    # deployment名称
+    name: http-deployment
+    # deployment标签
+    labels:
+        app: http-deployment
+spec:
+    replicas: 3 # pod期望保活的数量
+    selector: # pod选择器，即选择哪些pod属于这个deployment，如下，选择的是标签为app=http-server的pod
+        matchLabels:
+            app: http-server
+    strategy: # 更新升级策略
+        type: RollingUpdate # 滚动更新，即永远有可用的pod，逐个替换为新的pod，此外还有Recreate，表示先删除所有旧的pod，再创建新的pod
+        rollingUpdate: # 滚动更新策略
+            maxSurge: 1 # 滚动更新时，先创建新的，再删除旧的，maxSurge表示最多可以比期望的pod数量多几个，即最多可以创建几个新的pod以便删除对应数量的旧的pod
+            maxUnavailable: 1 # 滚动更新时，最多可以有几个旧的pod不可用，即最多可以有几个旧的pod正在被删除，但还未删除完成
