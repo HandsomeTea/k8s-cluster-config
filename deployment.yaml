@@ -23,7 +23,7 @@ spec:
                 app: http-server # pod标签
         spec:
             containers:
-                - name: app # 容器名称，容器可多ge
+                - name: app # 容器名称，容器可多个，一般为一个比较合适(即一个deployment管理一个服务)
                   image: images.my-company.example/app:v4 # 容器对应的镜像地址
                   ports:
                       - containerPort: 80 # 容器对外提供服务的端口
